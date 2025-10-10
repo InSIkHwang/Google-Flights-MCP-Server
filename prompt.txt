@@ -1,0 +1,163 @@
+# 개요
+2026년 1월 한 달 동안 김해국제공항(PUS) ↔ 호치민(SGN) 노선의  
+Vietnam Airlines 직항 왕복 항공편 중, 가는 편과 오는 편의 최저가 항공편을 찾은 후 가장 저렴한 왕복 항공편을 찾습니다다.
+
+# 검색 조건
+- 가는편 출발지: PUS
+- 가는편 도착지: SGN
+- 오는편 출발지: PUS
+- 오는편 도착지: SGN
+- 편도도
+- 항공사: Vietnam Airlines 직항만 (Vietjet 등 다른 항공사 제외)
+- 성인 1명, 이코노미석
+- 출발일: 2026-01-01 ~ 2026-01-31 (매일 검색)
+
+# 규칙
+- 반드시 모든 날짜에 대한 데이터를 수집할 것 (호출 오류를 제외)
+
+# MCP 호출 (매일 출발일 기준) 이전 호출 후 JSON 파일 작성 전에 다음 호출 시작하지 말 것
+
+//가는 편
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-01", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-02", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-03", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-04", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-05", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-06", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-07", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-08", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-09", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-10", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-11", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-12", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-13", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-14", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-15", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-16", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-17", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-18", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-19", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-20", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-21", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-22", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-23", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-24", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-25", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-26", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-27", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-28", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-29", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-30", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="PUS", destination="SGN", date="2026-01-31", adults=1, seat_type="economy")
+
+
+//오는 편
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-01", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-02", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-03", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-04", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-05", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-06", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-07", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-08", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-09", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-10", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-11", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-12", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-13", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-14", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-15", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-16", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-17", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-18", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-19", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-20", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-21", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-22", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-23", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-24", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-25", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-26", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-27", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-28", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-29", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-30", adults=1, seat_type="economy")
+
+get_flights_on_date(origin="SGN", destination="PUS", date="2026-01-31", adults=1, seat_type="economy")
+
+
+# 데이터 처리 및 출력
+0. 한 번의 get_flights_on_date 호출 후 임의 JSON 파일에 해당 데이터 저장 후 다음 호출 시작  
+1. 호출마다 새로운 파일을 생성하는게 아닌 하나의 파일에 추가 작성
+2. Vietnam Airlines 직항편만 유지 (`stops=0`)  
+3. 가격 없는 항공편 제거  
+4. 각 출발일별 최저가 계산  
+5. 가격 오름차순 정렬 후 상위 3개 선택  
+6. 결과 표 작성 (순위 | 출발일 | 복귀일 | 항공편 | 총요금 | 출발시간 | 도착시간 | 소요시간 | 링크)  
+
+# 조사 로그
+- 건너뛴 날짜  
+- 실패 호출 목록  
+- 필드 매핑 불확실성 (airline, price, duration 등)
+
+# Notion 업로드
+최종 JSON 통합 후, 결과 표를 Notion 새 페이지에 작성

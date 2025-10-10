@@ -45,6 +45,21 @@ def parse_price(price_str):
     except ValueError:
         return float('inf') # Return infinity if conversion fails
 
+def filter_flights_by_airline(flights, airline_filter):
+    """Filters flights by airline name using case-insensitive partial matching."""
+    if not airline_filter or not airline_filter.strip():
+        return flights
+    
+    airline_filter_lower = airline_filter.lower().strip()
+    filtered_flights = []
+    
+    for flight in flights:
+        flight_name = getattr(flight, 'name', '')
+        if airline_filter_lower in flight_name.lower():
+            filtered_flights.append(flight)
+    
+    return filtered_flights
+
 def get_date_range(year, month):
     """Generates all dates within a given month."""
     try:
@@ -233,17 +248,21 @@ async def get_round_trip_flights(
         return json.dumps(error_payload)
 
 
-@mcp.tool(name="find_all_flights_in_range") # Renamed tool
+@mcp.tool(
+    name="find_all_flights_in_range_v2",
+    description="Finds available round-trip flights within a specified date range. Can optionally return only the cheapest flight found for each date pair."
+) # Renamed tool
 async def find_all_flights_in_range( # Renamed function
     origin: str,
     destination: str,
     start_date_str: str,
     end_date_str: str,
-    min_stay_days: Optional[int] = None,
-    max_stay_days: Optional[int] = None,
+    min_stay_days: str = None,
+    max_stay_days: str = None,
     adults: int = 1,
     seat_type: str = "economy",
-    return_cheapest_only: bool = False # Added parameter
+    return_cheapest_only: bool = False, # Added parameter
+    airline_filter: str = None # Added airline filter parameter
 ) -> str:
     """
     Finds available round-trip flights within a specified date range.
@@ -259,14 +278,31 @@ async def find_all_flights_in_range( # Renamed function
         adults: Number of adult passengers (default: 1).
         seat_type: Fare class (e.g., "economy", "business", default: "economy").
         return_cheapest_only: If True, returns only the cheapest flight for each date pair (default: False).
+        airline_filter: Filter flights by specific airline name (optional). Case-insensitive partial matching.
 
     Example Args:
         {"origin": "JFK", "destination": "MIA", "start_date_str": "2025-09-10", "end_date_str": "2025-09-20", "min_stay_days": 5}
         {"origin": "JFK", "destination": "MIA", "start_date_str": "2025-09-10", "end_date_str": "2025-09-20", "min_stay_days": 5, "return_cheapest_only": true}
+        {"origin": "JFK", "destination": "MIA", "start_date_str": "2025-09-10", "end_date_str": "2025-09-20", "airline_filter": "Delta"}
     """
     # Adjust print message based on mode
     search_mode = "cheapest flight per pair" if return_cheapest_only else "all flights"
-    print(f"MCP Tool: Finding {search_mode} {origin}<->{destination} between {start_date_str} and {end_date_str}...", file=sys.stderr)
+    airline_info = f" (filtered by airline: {airline_filter})" if airline_filter else ""
+    print(f"MCP Tool: Finding {search_mode} {origin}<->{destination} between {start_date_str} and {end_date_str}{airline_info}...", file=sys.stderr)
+
+    # Convert optional parameters to integers if provided
+    try:
+        if min_stay_days is not None and min_stay_days != "":
+            min_stay_days = int(min_stay_days)
+        else:
+            min_stay_days = None
+        if max_stay_days is not None and max_stay_days != "":
+            max_stay_days = int(max_stay_days)
+        else:
+            max_stay_days = None
+    except (ValueError, TypeError) as e:
+        error_payload = {"error": {"message": f"Invalid parameter type for min_stay_days or max_stay_days. Must be integer or null.", "type": "ValueError"}}
+        return json.dumps(error_payload)
 
     # Initialize list to store results based on mode
     results_data = []
@@ -333,22 +369,26 @@ async def find_all_flights_in_range( # Renamed function
 
             # Collect results based on mode
             if result and result.flights:
-                if return_cheapest_only:
-                    # Find and store only the cheapest for this pair
-                    cheapest_flight_for_pair = min(result.flights, key=lambda f: parse_price(f.price))
-                    results_data.append({
-                        "departure_date": depart_date.strftime('%Y-%m-%d'),
-                        "return_date": return_date.strftime('%Y-%m-%d'),
-                        "cheapest_flight": flight_to_dict(cheapest_flight_for_pair) # Store single cheapest
-                    })
-                else:
-                    # Store all flights for this pair
-                    flights_list = [flight_to_dict(f) for f in result.flights]
-                    results_data.append({
-                        "departure_date": depart_date.strftime('%Y-%m-%d'),
-                        "return_date": return_date.strftime('%Y-%m-%d'),
-                        "flights": flights_list # Store list of all flights
-                    })
+                # Apply airline filter if specified
+                filtered_flights = filter_flights_by_airline(result.flights, airline_filter)
+                
+                if filtered_flights:  # Only process if there are flights after filtering
+                    if return_cheapest_only:
+                        # Find and store only the cheapest for this pair
+                        cheapest_flight_for_pair = min(filtered_flights, key=lambda f: parse_price(f.price))
+                        results_data.append({
+                            "departure_date": depart_date.strftime('%Y-%m-%d'),
+                            "return_date": return_date.strftime('%Y-%m-%d'),
+                            "cheapest_flight": flight_to_dict(cheapest_flight_for_pair) # Store single cheapest
+                        })
+                    else:
+                        # Store all flights for this pair
+                        flights_list = [flight_to_dict(f) for f in filtered_flights]
+                        results_data.append({
+                            "departure_date": depart_date.strftime('%Y-%m-%d'),
+                            "return_date": return_date.strftime('%Y-%m-%d'),
+                            "flights": flights_list # Store list of all flights
+                        })
             # else: # Optional: Log if no flights were found for a specific pair
                 # print(f"MCP Tool: No flights found for {depart_date.strftime('%Y-%m-%d')} -> {return_date.strftime('%Y-%m-%d')}", file=sys.stderr)
 
@@ -376,7 +416,8 @@ async def find_all_flights_in_range( # Renamed function
                 "max_stay_days": max_stay_days,
                 "adults": adults,
                 "seat_type": seat_type,
-                "return_cheapest_only": return_cheapest_only # Include parameter in output
+                "return_cheapest_only": return_cheapest_only, # Include parameter in output
+                "airline_filter": airline_filter # Include airline filter in output
             },
             results_key: results_data, # Use dynamic key for results
             "errors_encountered": error_messages if error_messages else None
@@ -389,7 +430,8 @@ async def find_all_flights_in_range( # Renamed function
             "message": f"No flights found and no errors encountered for {origin} -> {destination} in the range {start_date_str} to {end_date_str}.",
             "search_parameters": {
                  "origin": origin, "destination": destination, "start_date": start_date_str, "end_date": end_date_str,
-                 "min_stay_days": min_stay_days, "max_stay_days": max_stay_days, "adults": adults, "seat_type": seat_type
+                 "min_stay_days": min_stay_days, "max_stay_days": max_stay_days, "adults": adults, "seat_type": seat_type,
+                 "airline_filter": airline_filter
             },
             "errors_encountered": error_messages if error_messages else None
         })

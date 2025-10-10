@@ -1,43 +1,57 @@
-# 개요  
-2026년 1월 한 달 동안 김해국제공항(PUS) ↔ 도쿄(NRT) 노선의  
-직항 왕복 항공편 중, 가는 편과 오는 편의 최저가 항공편을 찾은 후 가장 저렴한 왕복 항공편을 찾습니다.
-
-# 검색 조건  
-- 가는편 출발지: PUS  
-- 가는편 도착지: NRT  
-- 오는편 출발지: NRT  
-- 오는편 도착지: PUS  
-- 왕복  
-- 성인 1명, 이코노미석  
-- 기간: 2025-12-01 ~ 2026-01-31  
-
 # 규칙  
 - 반드시 모든 날짜에 대한 데이터를 수집할 것 (호출 오류를 제외)  
+- 월별로 분할하여 실행하여 API 호출 부담을 줄임
 
-# MCP 호출 (매일 출발일 기준)  
+# Python 도구 실행 (월별 분할 실행)  
 이전 호출 후 JSON 파일 작성 전에 다음 호출 시작하지 말 것  
 
-find_all_flights_in_range_v2(
-    origin="PUS",
-    destination="NRT",
-    start_date_str="2025-12-01",
-    end_date_str="2026-01-31",
-    min_stay_days=5,
-    max_stay_days=7,
-    adults=1,
-    seat_type="economy",
-    return_cheapest_only=True
-)
+
+# 예시
+
+## 2025년 12월
+```bash
+python flight_search_simple.py \
+  --origin PUS \
+  --destination NRT \
+  --start-date 2025-12-01 \
+  --end-date 2025-12-31 \
+  --min-stay 5 \
+  --max-stay 7 \
+  --adults 1 \
+  --seat economy \
+  --save
+```
+
+## 2026년 1월
+```bash
+python flight_search_simple.py \
+  --origin PUS \
+  --destination NRT \
+  --start-date 2026-01-01 \
+  --end-date 2026-01-31 \
+  --min-stay 5 \
+  --max-stay 7 \
+  --adults 1 \
+  --seat economy \
+  --save
+```
 
 # 데이터 처리 및 출력
 
-0. 한 번의 `find_all_flights_in_range_v2` 호출 후 임의 JSON 파일에 해당 데이터 저장 후 다음 호출 시작
-1. 호출마다 새로운 파일을 생성하는 게 아닌 **하나의 파일에 추가 작성 (append)**
-2. **직항편만 유지 (`stops=0`)**
-3. **가격 없는 항공편 제거**
-4. **각 출발일별 최저가 계산**
-5. **가격 오름차순 정렬 후 상위 3개 선택**
-6. 결과 표 작성
+0. 월별로 분할된 `flight_search_simple.py` 호출 후 각각 JSON 파일에 저장
+1. **월별 파일명**: `PUS_NRT_flights_YYYYMMDD_HHMMSS.json` (타임스탬프 포함)
+2. **통합 처리**: 두 파일을 합쳐서 최종 분석 수행
+3. **직항편만 유지 (`stops=0`)**
+4. **가격 없는 항공편 제거**
+5. **각 출발일별 최저가 계산**
+6. **가격 오름차순 정렬 후 상위 3개 선택**
+7. 결과 표 작성
+
+## 통합 데이터 처리 스크립트
+```python
+# process_nrt_data.py 실행
+python process_nrt_data.py
+```
 
 | 순위 | 출발일 | 복귀일 | 항공편 | 총요금 | 출발시간 | 도착시간 | 소요시간 | 링크 |
 | -- | --- | --- | --- | --- | ---- | ---- | ---- | -- |
@@ -47,6 +61,27 @@ find_all_flights_in_range_v2(
 * 건너뛴 날짜
 * 실패 호출 목록
 * 필드 매핑 불확실성 (예: airline, price, duration 등)
+
+# 예시 실행 순서
+
+1. **2025년 12월 검색 실행**
+   ```bash
+   python flight_search_simple.py --origin PUS --destination NRT --start-date 2025-12-01 --end-date 2025-12-31 --min-stay 5 --max-stay 7 --adults 1 --seat economy --save
+   ```
+
+2. **2026년 1월 검색 실행**
+   ```bash
+   python flight_search_simple.py --origin PUS --destination NRT --start-date 2026-01-01 --end-date 2026-01-31 --min-stay 5 --max-stay 7 --adults 1 --seat economy --save
+   ```
+
+3. **데이터 통합 및 분석**
+   ```bash
+   python process_nrt_data.py
+   ```
+
+4. **결과 확인**
+   - `nrt_flight_results.json`: 통합 분석 결과
+   - `nrt_final_results_summary.md`: 최종 요약 보고서
 
 # Notion 업로드
 

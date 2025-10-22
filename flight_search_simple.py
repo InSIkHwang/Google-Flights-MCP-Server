@@ -21,6 +21,21 @@ def parse_price(price_str):
     except ValueError:
         return float('inf')
 
+def filter_flights_by_airline(flights, airline_filter):
+    """항공사 이름으로 항공편 필터링 (대소문자 구분 없이 부분 일치)"""
+    if not airline_filter or not airline_filter.strip():
+        return flights
+    
+    airline_filter_lower = airline_filter.lower().strip()
+    filtered_flights = []
+    
+    for flight in flights:
+        flight_name = getattr(flight, 'name', '')
+        if airline_filter_lower in flight_name.lower():
+            filtered_flights.append(flight)
+    
+    return filtered_flights
+
 def search_flights(params):
     """항공편 검색 실행"""
     print(f"=== {params['origin']} ↔ {params['destination']} 항공편 검색 ===")
@@ -29,6 +44,8 @@ def search_flights(params):
     print(f"  - 기간: {params['start_date']} ~ {params['end_date']}")
     print(f"  - 체류일: {params['min_stay_days']}~{params['max_stay_days']}일")
     print(f"  - 승객: 성인 {params['adults']}명, {params['seat_type']}석")
+    if params.get('airline_filter'):
+        print(f"  - 항공사 필터: {params['airline_filter']}")
     
     try:
         # 날짜 범위 생성
@@ -81,25 +98,29 @@ def search_flights(params):
                         )
                         
                         if result and result.flights:
-                            # 최저가 항공편 찾기
-                            cheapest_flight = min(result.flights, key=lambda f: parse_price(f.price))
+                            # 항공사 필터 적용
+                            filtered_flights = filter_flights_by_airline(result.flights, params.get('airline_filter'))
                             
-                            flight_dict = {
-                                'departure_date': depart_date.strftime('%Y-%m-%d'),
-                                'return_date': return_date.strftime('%Y-%m-%d'),
-                                'stay_days': stay_duration,
-                                'cheapest_flight': {
-                                    'name': getattr(cheapest_flight, 'name', None),
-                                    'departure': getattr(cheapest_flight, 'departure', None),
-                                    'arrival': getattr(cheapest_flight, 'arrival', None),
-                                    'duration': getattr(cheapest_flight, 'duration', None),
-                                    'stops': getattr(cheapest_flight, 'stops', None),
-                                    'price': getattr(cheapest_flight, 'price', None),
-                                    'delay': getattr(cheapest_flight, 'delay', None),
-                                    'is_best': getattr(cheapest_flight, 'is_best', None),
+                            if filtered_flights:
+                                # 최저가 항공편 찾기
+                                cheapest_flight = min(filtered_flights, key=lambda f: parse_price(f.price))
+                                
+                                flight_dict = {
+                                    'departure_date': depart_date.strftime('%Y-%m-%d'),
+                                    'return_date': return_date.strftime('%Y-%m-%d'),
+                                    'stay_days': stay_duration,
+                                    'cheapest_flight': {
+                                        'name': getattr(cheapest_flight, 'name', None),
+                                        'departure': getattr(cheapest_flight, 'departure', None),
+                                        'arrival': getattr(cheapest_flight, 'arrival', None),
+                                        'duration': getattr(cheapest_flight, 'duration', None),
+                                        'stops': getattr(cheapest_flight, 'stops', None),
+                                        'price': getattr(cheapest_flight, 'price', None),
+                                        'delay': getattr(cheapest_flight, 'delay', None),
+                                        'is_best': getattr(cheapest_flight, 'is_best', None),
+                                    }
                                 }
-                            }
-                            results_data.append(flight_dict)
+                                results_data.append(flight_dict)
                         else:
                             print(f"결과 없음: {depart_date} -> {return_date}")
                             
@@ -254,6 +275,7 @@ def main():
     parser.add_argument('--max-stay', type=int, default=7, help='최대 체류일 (기본값: 7)')
     parser.add_argument('--adults', type=int, default=1, help='성인 승객 수 (기본값: 1)')
     parser.add_argument('--seat', default='economy', choices=['economy', 'business', 'first'], help='좌석 등급 (기본값: economy)')
+    parser.add_argument('--airline-filter', help='특정 항공사로 필터링 (대소문자 구분 없이 부분 일치)')
     parser.add_argument('--save', action='store_true', help='결과를 JSON 파일로 저장')
     
     args = parser.parse_args()
@@ -272,7 +294,8 @@ def main():
         'min_stay_days': args.min_stay,
         'max_stay_days': args.max_stay,
         'adults': args.adults,
-        'seat_type': args.seat
+        'seat_type': args.seat,
+        'airline_filter': args.airline_filter
     }
     
     try:

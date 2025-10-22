@@ -10,6 +10,7 @@
 
 ## 2025년 12월
 ```bash
+# 모든 항공사 검색
 python flight_search_simple.py \
   --origin PUS \
   --destination NRT \
@@ -20,10 +21,24 @@ python flight_search_simple.py \
   --adults 1 \
   --seat economy \
   --save
+
+# 특정 항공사 필터링 (예: 대한항공)
+python flight_search_simple.py \
+  --origin PUS \
+  --destination NRT \
+  --start-date 2025-12-01 \
+  --end-date 2025-12-31 \
+  --min-stay 5 \
+  --max-stay 7 \
+  --adults 1 \
+  --seat economy \
+  --airline-filter "대한항공" \
+  --save
 ```
 
 ## 2026년 1월
 ```bash
+# 모든 항공사 검색
 python flight_search_simple.py \
   --origin PUS \
   --destination NRT \
@@ -34,18 +49,32 @@ python flight_search_simple.py \
   --adults 1 \
   --seat economy \
   --save
+
+# 특정 항공사 필터링 (예: 아시아나)
+python flight_search_simple.py \
+  --origin PUS \
+  --destination NRT \
+  --start-date 2026-01-01 \
+  --end-date 2026-01-31 \
+  --min-stay 5 \
+  --max-stay 7 \
+  --adults 1 \
+  --seat economy \
+  --airline-filter "아시아나" \
+  --save
 ```
 
 # 데이터 처리 및 출력
 
 0. 월별로 분할된 `flight_search_simple.py` 호출 후 각각 JSON 파일에 저장
 1. **월별 파일명**: `PUS_NRT_flights_YYYYMMDD_HHMMSS.json` (타임스탬프 포함)
-2. **통합 처리**: 두 파일을 합쳐서 최종 분석 수행
-3. **직항편만 유지 (`stops=0`)**
-4. **가격 없는 항공편 제거**
-5. **각 출발일별 최저가 계산**
-6. **가격 오름차순 정렬 후 상위 3개 선택**
-7. 결과 표 작성
+2. **항공사 필터링**: `--airline-filter` 옵션으로 특정 항공사만 검색 가능
+3. **통합 처리**: 두 파일을 합쳐서 최종 분석 수행
+4. **직항편만 유지 (`stops=0`)**
+5. **가격 없는 항공편 제거**
+6. **각 출발일별 최저가 계산**
+7. **가격 오름차순 정렬 후 상위 3개 선택**
+8. 결과 표 작성
 
 ## 통합 데이터 처리 스크립트
 ```python
@@ -64,6 +93,8 @@ python process_nrt_data.py
 
 # 예시 실행 순서
 
+## 모든 항공사 검색
+
 1. **2025년 12월 검색 실행**
    ```bash
    python flight_search_simple.py --origin PUS --destination NRT --start-date 2025-12-01 --end-date 2025-12-31 --min-stay 5 --max-stay 7 --adults 1 --seat economy --save
@@ -72,6 +103,18 @@ python process_nrt_data.py
 2. **2026년 1월 검색 실행**
    ```bash
    python flight_search_simple.py --origin PUS --destination NRT --start-date 2026-01-01 --end-date 2026-01-31 --min-stay 5 --max-stay 7 --adults 1 --seat economy --save
+   ```
+
+## 특정 항공사 필터링 검색
+
+1. **대한항공만 검색 (2025년 12월)**
+   ```bash
+   python flight_search_simple.py --origin PUS --destination NRT --start-date 2025-12-01 --end-date 2025-12-31 --min-stay 5 --max-stay 7 --adults 1 --seat economy --airline-filter "대한항공" --save
+   ```
+
+2. **아시아나 항공만 검색 (2026년 1월)**
+   ```bash
+   python flight_search_simple.py --origin PUS --destination NRT --start-date 2026-01-01 --end-date 2026-01-31 --min-stay 5 --max-stay 7 --adults 1 --seat economy --airline-filter "아시아나" --save
    ```
 
 3. **데이터 통합 및 분석**
